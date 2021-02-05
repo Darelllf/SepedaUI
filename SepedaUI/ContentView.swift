@@ -53,32 +53,56 @@ struct ContentView: View {
         ProductModel(id: 10, namaProduk: "Pacific", fotoProduk: "foto10", hargaProduk: 2000000, lokasi: "Kab. Sumedang", ratingCount: 4, jumlahRating: 56),
     ]
     
+    @State var jumlahKeranjang: Int = 0
+    
     var body: some View {
         NavigationView{
             ScrollView{
                 ForEach(data){ row in
                     VStack(spacing: 10){
-                        Product(data: row)
+                        Product(data: row, jumlahproduk: self.$jumlahKeranjang)
                     }
                     .padding()
                 }
             }
             .navigationBarTitle("Sepeda MTB")
             .navigationBarItems(
-            trailing:
-                HStack(spacing: 20){
-                    Button(action: {print("")}){
-                        Image(systemName: "person.fill")
+                trailing:
+                    HStack(spacing: 20){
+                        Button(action: {print("")}){
+                            Image(systemName: "person.fill")
+                        }
+                        
+                        keranjangView(jumlah: $jumlahKeranjang)
                     }
-                    
-                    Button(action: {print("")}){
-                        Image(systemName: "cart.fill")
-                    }
-                }
             )
         }
         .accentColor(Color.secondary)
         .navigationViewStyle(StackNavigationViewStyle())
+    }
+}
+
+struct keranjangView: View {
+    
+    @Binding var jumlah: Int
+    
+    var body: some View{
+        ZStack{
+            Button(action: {print("")}){
+                Image(systemName: "cart.fill")
+                    .resizable()
+                    .frame(width:20, height:20)
+                
+            }
+            Text("\(jumlah)")
+                .foregroundColor(Color.white)
+                .frame(width: 10, height: 10)
+                .font(.body)
+                .padding(5)
+                .background(Color.red)
+                .clipShape(/*@START_MENU_TOKEN@*/Circle()/*@END_MENU_TOKEN@*/)
+                .offset(x: 10, y: -10)
+        }
     }
 }
 
@@ -92,19 +116,21 @@ struct Product: View {
     
     let data: ProductModel
     
+    @Binding var jumlahproduk: Int
+    
     var body: some View{
         VStack(alignment: .leading){
             
             
             
-//          foto
+            //          foto
             ZStack(alignment: .topTrailing){
                 Image(self.data.fotoProduk)
                     .resizable()
                     .aspectRatio(contentMode: /*@START_MENU_TOKEN@*/.fill/*@END_MENU_TOKEN@*/)
                     .frame(height: 250)
                     .clipped()
-                    
+                
                 Button(action: {print("like")}){
                     Image(systemName: "heart")
                         .padding()
@@ -148,27 +174,36 @@ struct Product: View {
             .padding(.leading)
             .padding(.trailing)
             .padding(.top, 5)
+            tambahKeranjang(jumlah: $jumlahproduk)
             
-            Button(action: {print("ditambahkan")}) {
-                HStack{
-                    Spacer()
-                    HStack{
-                        Image(systemName: "cart")
-                        Text("Tambah ke keranjang")
-                            .font(.callout)
-                            .padding()
-                    }
-                    Spacer()
-                    
-                }
-            }
-            .background(Color.green)
-            .foregroundColor(Color.white)
-            .cornerRadius(10)
-            .padding()
         }
         .background(Color("warna"))
         .cornerRadius(15)
     }
     
+}
+
+struct tambahKeranjang: View {
+    
+    @Binding var jumlah: Int
+    
+    var body: some View{
+        Button(action: {self.jumlah += 1}) {
+            HStack{
+                Spacer()
+                HStack{
+                    Image(systemName: "cart")
+                    Text("Tambah ke keranjang")
+                        .font(.callout)
+                        .padding()
+                }
+                Spacer()
+                
+            }
+        }
+        .background(Color.green)
+        .foregroundColor(Color.white)
+        .cornerRadius(10)
+        .padding()
+    }
 }
